@@ -5,6 +5,17 @@
     "description": "test_pipeline",
     "type": "object",
     "definitions": {
+        "skipping_options": {
+            "title": "Skipping options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "skip_trim": {
+                    "type": "boolean"
+                }
+            }
+        },
         "input_output_options": {
             "title": "Input/output options",
             "type": "object",
@@ -277,6 +288,9 @@
         }
     },
     "allOf": [
+        {
+            "$ref": "#/definitions/skipping_options"
+        },
         {
             "$ref": "#/definitions/input_output_options"
         },

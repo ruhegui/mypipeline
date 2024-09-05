@@ -10,6 +10,7 @@ include { paramsSummaryMap       } from 'plugin/nf-validation'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_mypipeline_pipeline'
+include { SEQTK_TRIM } from '../modules/nf-core/seqtk/trim/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,6 +28,16 @@ workflow MYPIPELINE {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
+    //
+    // MODULE: Run SEQTK_TRIM
+    //
+    if (!params.skip_trim) {
+        SEQTK_TRIM (
+            ch_samplesheet
+        )
+        ch_trimmed  = SEQTK_TRIM.out.reads
+        ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
+    }
     //
     // MODULE: Run FastQC
     //
@@ -89,6 +100,7 @@ workflow MYPIPELINE {
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
+
 }
 
 /*
